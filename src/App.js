@@ -1,9 +1,17 @@
 import React from 'react'
 
+import './global.css'
+import './App.css'
+
 const App = () => {
   return(
-    <div>
-      <h1>Hello Dev</h1>
+    <div id='app'>
+      <aside>
+
+      </aside>
+      <main>
+
+      </main>
     </div>
   )
 }

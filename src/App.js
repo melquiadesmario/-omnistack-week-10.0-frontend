@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 import './global.css'
 import './App.css'
@@ -6,6 +6,25 @@ import './Sidebar.css'
 import './Main.css'
 
 const App = () => {
+  const [latitude, setLatitude] = useState('')
+  const [longitude, setLongitude] = useState('')
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords
+        setLatitude(latitude)
+        setLongitude(longitude)
+      },
+      (err) => {
+        console.log('Error', err)
+      },
+      {
+        timeout: 30000
+      }
+    )
+  }, [])
+
   return(
     <div id='app'>
       <aside>
@@ -33,7 +52,10 @@ const App = () => {
               <input
                 name='latitude'
                 id='latitude'
+                type='number'
                 required
+                value={ latitude }
+                onChange={ event => setLatitude(event.target.value) }
               />
             </div>
             <div className='input-block'>
@@ -41,7 +63,10 @@ const App = () => {
               <input
                 name='longitude'
                 id='longitude'
+                type='number'
                 required
+                value={ longitude }
+                onChange={ event => setLongitude(event.target.value) }
               />
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import api from './services/api'
 
 import './global.css'
 import './App.css'
@@ -6,6 +7,9 @@ import './Sidebar.css'
 import './Main.css'
 
 const App = () => {
+  const [devs, setDevs] = useState([])
+  const [github_username, setGithubUsername] = useState('')
+  const [techs, setTechs] = useState('')
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
 
@@ -25,17 +29,42 @@ const App = () => {
     )
   }, [])
 
+  useEffect(() => {
+    async function loadDevs(){
+      const response = await api.get('/devs')
+      setDevs(response.data)
+    }
+
+    loadDevs()
+  }, [])
+
+  async function handleAddDev(event){
+    event.preventDefault()
+
+    const response = await api.post('/devs', {
+      github_username,
+      techs,
+      latitude,
+      longitude
+    })
+
+    setGithubUsername('')
+    setTechs('')
+  }
+
   return(
     <div id='app'>
       <aside>
         <strong>Register</strong>
-        <form>
+        <form onSubmit={ handleAddDev }>
           <div className='input-block'>
             <label htmlFor='github_username'>User Github</label>
             <input
               name='github_username'
               id='github_username'
               required
+              value={ github_usename }
+              onChange={ event => setGithubUsername(event.target.value) }
             />
           </div>
           <div className='input-block'>
@@ -44,6 +73,8 @@ const App = () => {
               name='techs'
               id='techs'
               required
+              value={ techs }
+              onChange={ event => setTechs(event.target.value) }
             />
           </div>
           <div className="input-group">
@@ -79,50 +110,19 @@ const App = () => {
       </aside>
       <main>
         <ul>
-          <li className='dev-item'>
-            <header>
-              <img src='https://avatars2.githubusercontent.com/u/24658474?s=460&u=3431e2a69457286717db18bbb6083ea3956337fa&v=4' alt='Melquíades Mário' />
-              <div className='user-info'>
-                <strong>Melquíades Mário</strong>
-                <span>ReactJS, React Native, Node.js, MongoDB</span>
-              </div>
-            </header>
-            <p>Developer and enthusiast of javascript technologies, such as Node.js, React JS, React Native and MongoDB.</p>
-            <a href='https://github.com/melquiadesmario'>Access Github Profile</a>
-          </li>
-          <li className='dev-item'>
-            <header>
-              <img src='https://avatars2.githubusercontent.com/u/24658474?s=460&u=3431e2a69457286717db18bbb6083ea3956337fa&v=4' alt='Melquíades Mário' />
-              <div className='user-info'>
-                <strong>Melquíades Mário</strong>
-                <span>ReactJS, React Native, Node.js, MongoDB</span>
-              </div>
-            </header>
-            <p>Developer and enthusiast of javascript technologies, such as Node.js, React JS, React Native and MongoDB.</p>
-            <a href='https://github.com/melquiadesmario'>Access Github Profile</a>
-          </li>
-          <li className='dev-item'>
-            <header>
-              <img src='https://avatars2.githubusercontent.com/u/24658474?s=460&u=3431e2a69457286717db18bbb6083ea3956337fa&v=4' alt='Melquíades Mário' />
-              <div className='user-info'>
-                <strong>Melquíades Mário</strong>
-                <span>ReactJS, React Native, Node.js, MongoDB</span>
-              </div>
-            </header>
-            <p>Developer and enthusiast of javascript technologies, such as Node.js, React JS, React Native and MongoDB.</p>
-            <a href='https://github.com/melquiadesmario'>Access Github Profile</a>
-          </li>
-          <li className='dev-item'>
-            <header>
-              <img src='https://avatars2.githubusercontent.com/u/24658474?s=460&u=3431e2a69457286717db18bbb6083ea3956337fa&v=4' alt='Melquíades Mário' />
-              <div className='user-info'>
-                <strong>Melquíades Mário</strong>
-                <span>ReactJS, React Native, Node.js, MongoDB</span>
-              </div>
-            </header>
-            <p>Developer and enthusiast of javascript technologies, such as Node.js, React JS, React Native and MongoDB.</p>
-            <a href='https://github.com/melquiadesmario'>Access Github Profile</a>
-          </li>
+          { devs.map(dev => (
+            <li className='dev-item'>
+              <header>
+                <img src={ dev.avatar_url } alt={ dev.name } />
+                <div className='user-info'>
+                  <strong>{ dev.name }</strong>
+                  <span>{ dev.techs.join(', ')}</span>
+                </div>
+              </header>
+              <p>{ dev.bio }</p>
+              <a href={ `https://github.com/${ dev.github_usename }` }>Access Github Profile</a>
+            </li>
+          ))}
         </ul>
       </main>
     </div>
